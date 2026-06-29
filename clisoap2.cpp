@@ -1,20 +1,30 @@
 #include "httplib.h"
-#include "json.hpp" // nlohmann/json
+#include "json.hpp"
 #include <iostream>
 
 using json = nlohmann::json;
 
 int main() {
-    httplib::Client cli("https://api.mymemory.translated.net");
+    // 1. Usar HTTP por el puerto 80 para evitar el requerimiento de OpenSSL
+    httplib::Client cli("http://api.mymemory.translated.net", 80);
+    cli.set_connection_timeout(5, 0);
     
-    // Suponiendo que ya tenemos el texto del SOAP
-    std::string ingles = "one hundred thousand eighty";
+    // 2. Codificamos los espacios como %20 para que la URL sea válida
+    std::string ingles = "one%20hundred%20thousand%20eighty";
     
-    auto res = cli.Get(("/get?q=" + ingles + "&langpair=en|es").c_str());
+    std::string path = "/get?q=" + ingles + "&langpair=en|es";
+    auto res = cli.Get(path.c_str());
     
     if (res) {
-        auto j = json::parse(res->body);
-        std::cout << "Traduccion: " << j["responseData"]["translatedText"] << std::endl;
+        try {
+            auto j = json::parse(res->body);
+            std::cout << "Traduccion: " << j["responseData"]["translatedText"] << std::endl;
+        } catch (json::parse_error& e) {
+            std::cout << "Error al procesar JSON. Body: " << res->body << std::endl;
+        }
+    } else {
+        std::cout << "Error en la peticion HTTP: " << httplib::to_string(res.error()) << std::endl;
     }
+    
     return 0;
 }

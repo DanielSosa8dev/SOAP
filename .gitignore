@@ -1,3 +1,10 @@
-bin/
-obj/
-appsettings*.json
+# Agregamos las carpetas que no queremos subir nunca
+echo "node_modules/" >> .gitignore
+echo "target/" >> .gitignore
+echo "vendor_php/" >> .gitignore
+echo "*.exe" >> .gitignore
+echo "bin/" >> .gitignore
+echo "obj/" >> .gitignore
+
+# Ahora sí, añadimos el archivo .gitignore modificado
+git add .gitignore
