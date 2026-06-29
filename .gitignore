@@ -1,2 +1,4 @@
-/vendor/
-.env
+/local/
+/extlib/
+*.perl
+cpanfile.snapshot
